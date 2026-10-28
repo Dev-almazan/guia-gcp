@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Examen GCP - Guía HITSS</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        gcp: {
+                            blue: '#4285F4',
+                            red: '#EA4335',
+                            yellow: '#FBBC04',
+                            green: '#34A853',
+                            dark: '#1E293B',
+                            card: '#0F172A'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased bg-slate-950 text-slate-100">
+
+    <!-- Header Navigation -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.showHome()">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid fa-cloud text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-none text-white">Simulador GCP</h1>
+                    <span class="text-xs text-blue-400 font-medium">Guía de Certificación HITSS</span>
+                </div>
+            </div>
+            
+
+            <!-- Header Quick Stats / Actions -->
+            <div id="header-stats" class="hidden md:flex items-center space-x-6 text-sm">
+                <div class="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+                    <i class="fa-solid fa-layer-group text-blue-400"></i>
+                    <span id="stat-section" class="text-slate-300 font-medium">Todas las secciones</span>
+                </div>
+                <div id="timer-display" class="hidden flex items-center space-x-2 bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-mono font-bold">
+                    <i class="fa-regular fa-clock"></i>
+                    <span id="timer-text">00:00</span>
+                </div>
+            </div>
+
+            <div>
+                <button onclick="app.showHome()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-lg border border-slate-700 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="hidden sm:inline">Menú Principal</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+
+        <!-- VIEW 1: HOME / CONFIGURATION -->
+        <div id="view-home" class="max-w-4xl mx-auto w-full space-y-8 animate-fadeIn">
+            <!-- Welcome Banner -->
+            <div class="bg-gradient-to-r from-blue-900/40 via-indigo-900/30 to-slate-900 border border-blue-500/30 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+                <div class="absolute right-0 top-0 -mt-8 -mr-8 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-2xl">
+                    <span class="bg-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-blue-500/30">
+                        Preparación Técnica GCP
+                    </span>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold text-white mt-3 mb-2">
+                        Simulador de Evaluación HITSS
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        Pon a prueba y afianza tus conocimientos sobre Google Cloud Platform con las preguntas completas recopiladas de la Guía GCP HITSS.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Configuration Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Mode Selector -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-sliders text-blue-400"></i>
+                        <span>1. Selecciona el Modo</span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 gap-3">
+                        <label id="label-mode-practice" class="relative flex items-start p-4 rounded-xl border border-blue-500/50 bg-blue-500/10 cursor-pointer transition hover:bg-slate-800">
+                            <input type="radio" name="exam-mode" value="practice" checked class="mt-1 text-blue-500 focus:ring-blue-400" onchange="app.updateModeUI('practice')">
+                            <div class="ml-3">
+                                <span class="block font-semibold text-white">Modo Práctica / Estudio</span>
+                                <span class="block text-xs text-slate-400 mt-0.5">Retroalimentación e explicaciones inmediatas al responder cada pregunta. Sin límite de tiempo.</span>
+                            </div>
+                        </label>
+
+                        <label id="label-mode-sim" class="relative flex items-start p-4 rounded-xl border border-slate-800 bg-slate-900/50 cursor-pointer transition hover:bg-slate-800">
+                            <input type="radio" name="exam-mode" value="simulation" class="mt-1 text-blue-500 focus:ring-blue-400" onchange="app.updateModeUI('simulation')">
+                            <div class="ml-3">
+                                <span class="block font-semibold text-white">Modo Simulación de Examen</span>
+                                <span class="block text-xs text-slate-400 mt-0.5">Cronómetro activo, navegación libre entre preguntas y calificación final detallada al terminar.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Filters & Options -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center space-x-2 mb-4">
+                            <i class="fa-solid fa-filter text-blue-400"></i>
+                            <span>2. Filtros y Configuración</span>
+                        </h3>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Selección de Sección</label>
+                                    <select id="select-section"
+                                        class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 text-sm">
+                                        <option value="ALL">Examen Completo (Todas las Secciones)</option>
+                                        <option value="REAL">Examen Real (Las 7 Dudas Clave)</option>
+                                        <option value="SEC1">Sección 1 (16 Preguntas)</option>
+                                        <option value="SEC2">Sección 2 (24 Preguntas)</option>
+                                        <option value="COMP">Complemento (20 Preguntas)</option>
+                                    </select>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-shuffle text-indigo-400"></i>
+                                    <div>
+                                        <div class="text-sm font-medium text-white">Mezclar Preguntas</div>
+                                        <div class="text-xs text-slate-400">Orden aleatorio de reactivos y opciones</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" id="chk-shuffle" checked class="w-5 h-5 accent-blue-500 rounded cursor-pointer">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="app.startQuiz()" class="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-blue-500/25 transition transform active:scale-[0.99] flex items-center justify-center space-x-2 text-base">
+                        <i class="fa-solid fa-play"></i>
+                        <span>Iniciar Simulador</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: QUIZ / SIMULATION -->
+        <div id="view-quiz" class="hidden max-w-4xl mx-auto w-full space-y-6">
+            
+            <!-- Progress & Controls Bar -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-4 w-full sm:w-auto">
+                    <span id="quiz-question-counter" class="text-sm font-bold text-slate-300 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 whitespace-nowrap">
+                        Pregunta 1 de 60
+                    </span>
+                    <!-- Progress Bar -->
+                    <div class="w-full sm:w-48 bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800">
+                        <div id="quiz-progress-bar" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
+                    <button id="btn-flag" onclick="app.toggleFlagCurrent()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
+                        <i class="fa-regular fa-bookmark"></i>
+                        <span id="btn-flag-text">Marcar</span>
+                    </button>
+                    <button onclick="app.finishQuizPrompt()" class="text-xs bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-lg font-semibold transition">
+                        Finalizar Examen
+                    </button>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl relative">
+                <!-- Section Badge -->
+                <div class="flex items-center justify-between mb-4">
+                    <span id="q-section-badge" class="bg-blue-500/10 text-blue-400 text-xs font-bold px-3 py-1 rounded-full border border-blue-500/20">
+                        SECCIÓN 1
+                    </span>
+                    <span id="q-flagged-indicator" class="hidden text-xs text-amber-400 font-semibold flex items-center space-x-1">
+                        <i class="fa-solid fa-bookmark"></i>
+                        <span>Marcada para revisar</span>
+                    </span>
+                </div>
+
+                <!-- Question Text -->
+                <h3 id="q-text" class="text-lg sm:text-xl font-bold text-white mb-6 leading-snug">
+                    ¿Qué comando permite crear una política en Cloud Armor?
+                </h3>
+
+                <!-- Options List -->
+                <div id="q-options" class="space-y-3">
+                    <!-- Dynamic Options -->
+                </div>
+
+                <!-- Instant Feedback Area (Practice Mode) -->
+                <div id="q-feedback" class="hidden mt-6 p-4 rounded-xl border text-sm space-y-2 animate-fadeIn">
+                    <div id="q-feedback-title" class="font-bold flex items-center space-x-2"></div>
+                    <div id="q-feedback-body" class="text-slate-300"></div>
+                </div>
+            </div>
+
+            <!-- Navigation Bar -->
+            <div class="flex items-center justify-between pt-2">
+                <button id="btn-prev" onclick="app.prevQuestion()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2.5 px-5 rounded-xl border border-slate-700 transition flex items-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Anterior</span>
+                </button>
+
+                <!-- Grid Navigator Button -->
+                <button onclick="app.toggleGridModal()" class="text-xs text-slate-400 hover:text-white bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 flex items-center space-x-1">
+                    <i class="fa-solid fa-th"></i>
+                    <span class="hidden sm:inline">Mapa de Preguntas</span>
+                </button>
+
+                <button id="btn-next" onclick="app.nextQuestion()" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-6 rounded-xl shadow-lg shadow-blue-600/20 transition flex items-center space-x-2">
+                    <span>Siguiente</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW 3: RESULTS / REVIEW -->
+        <div id="view-results" class="hidden max-w-4xl mx-auto w-full space-y-8 animate-fadeIn">
+            <!-- Score Summary Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl text-center relative overflow-hidden">
+                <div class="max-w-md mx-auto space-y-4">
+                    <div id="score-badge" class="inline-block p-4 rounded-full bg-slate-800 border border-slate-700 mb-2">
+                        <!-- Score Icon Dynamically Inserted -->
+                    </div>
+                    <h2 id="score-status" class="text-2xl sm:text-3xl font-extrabold text-white">¡Examen Finalizado!</h2>
+                    <p id="score-subtext" class="text-slate-400 text-sm">A continuación se muestra el desglose de tu rendimiento.</p>
+
+                    <!-- Score Meter -->
+                    <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-2">
+                        <div class="text-4xl sm:text-5xl font-black text-white" id="score-percentage">0%</div>
+                        <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest" id="score-fraction">0 de 0 Aciertos</div>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-3 gap-3 pt-2">
+                        <div class="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl">
+                            <div class="text-xs text-emerald-400 font-semibold">Correctas</div>
+                            <div id="stat-correct-count" class="text-xl font-bold text-emerald-400 mt-1">0</div>
+                        </div>
+                        <div class="bg-rose-500/10 border border-rose-500/20 p-3 rounded-xl">
+                            <div class="text-xs text-rose-400 font-semibold">Incorrectas</div>
+                            <div id="stat-incorrect-count" class="text-xl font-bold text-rose-400 mt-1">0</div>
+                        </div>
+                        <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl">
+                            <div class="text-xs text-slate-400 font-semibold">Sin Contestar</div>
+                            <div id="stat-unanswered-count" class="text-xl font-bold text-slate-300 mt-1">0</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 pt-4">
+                        <button onclick="app.restartExam()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-rotate-right"></i>
+                            <span>Reintentar Examen</span>
+                        </button>
+                        <button onclick="app.showHome()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-3 px-4 rounded-xl border border-slate-700 transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-house"></i>
+                            <span>Menú Principal</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Question Review Section -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-list-check text-blue-400"></i>
+                        <span>Revisión Detallada de Respuestas</span>
+                    </h3>
+                    <div class="flex space-x-2">
+                        <button onclick="app.filterReview('ALL')" class="review-filter-btn text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-medium" data-filter="ALL">Todas</button>
+                        <button onclick="app.filterReview('WRONG')" class="review-filter-btn text-xs bg-slate-800 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg font-medium" data-filter="WRONG">Solo Fallos</button>
+                    </div>
+                </div>
+
+                <div id="review-list" class="space-y-4">
+                    <!-- Dynamic Detailed Review Items -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal: Question Grid Navigator -->
+    <div id="modal-grid" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h4 class="font-bold text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-th text-blue-400"></i>
+                    <span>Mapa de Preguntas</span>
+                </h4>
+                <button onclick="app.toggleGridModal()" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="text-xs text-slate-400 flex items-center justify-between">
+                <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded bg-blue-600 inline-block"></span> <span>Actual</span></span>
+                <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded bg-emerald-600/40 border border-emerald-500 inline-block"></span> <span>Respondida</span></span>
+                <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded bg-amber-500/30 border border-amber-500 inline-block"></span> <span>Marcada</span></span>
+                <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded bg-slate-800 inline-block"></span> <span>Pendiente</span></span>
+            </div>
+
+            <div id="grid-buttons-container" class="grid grid-cols-6 sm:grid-cols-10 gap-2 max-h-64 overflow-y-auto p-1">
+                <!-- Dynamic Grid Buttons -->
+            </div>
+
+            <button onclick="app.toggleGridModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2 rounded-xl text-sm border border-slate-700">
+                Cerrar
+            </button>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        // MASTER QUESTION BANK FROM HITSS GCP GUIDE
+       
+        const RAW_QUESTIONS_BANK = [
+                // EXAMEN REAL (Preguntas Clave)
+                {
+                    section: "EXAMEN REAL",
+                    id: "REAL_Q1",
+                    question: "¿Qué elemento dirige las solicitudes entrantes en un HTTP(S) Load Balancer?",
+                    options: [
+                        "Global IP",
+                        "URL Map",
+                        "TCP Route",
+                        "Backend Service"
+                    ],
+                    correct: 1,
+                    explanation: "En un HTTP(S) Load Balancer, el URL Map inspecciona el host y la ruta de la solicitud entrante (URL/path) y la enruta hacia el backend correspondiente."
+                },
+                {
+                    section: "EXAMEN REAL",
+                    id: "REAL_Q2",
+                    question: "¿Qué componente puede usar múltiples IP públicas para escalar salidas NAT?",
+                    options: [
+                        "Router personalizado",
+                        "Cloud NAT auto mode",
+                        "Manual NAT config",
+                        "Min ports per VM"
+                    ],
+                    correct: 2,
+                    explanation: "La configuración manual (Manual NAT config) en Cloud NAT permite asignar un conjunto explícito de direcciones IP públicas para escalar la capacidad de puertos y conexiones salientes."
+                },
+                {
+                    section: "EXAMEN REAL",
+                    id: "REAL_Q3",
+                    question: "¿Qué comando inicializa un proyecto de Terraform?",
+                    options: [
+                        "terraform apply",
+                        "terraform plan",
+                        "terraform init",
+                        "terraform build"
+                    ],
+                    correct: 2,
+                    explanation: "'terraform init' inicializa el directorio de trabajo, descargando los proveedores (providers) y configurando el backend de estado."
+                },
+                {
+                    section: "EXAMEN REAL",
+                    id: "REAL_Q4",
+                    question: "¿Qué política puede forzar el uso de CMEK (Customer-Managed Encryption Keys) en recursos?",
+                    options: [
+                        "constraints/compute.requireCmek",
+                        "constraints/gcp.forceKms",
+                        "constraints/kms.enforceCmek",
+                        "constraints/security.requireEncryption"
+                    ],
+                    correct: 0,
+                    explanation: "La política de organización 'constraints/compute.requireCmek' exige que los discos y recursos de Compute Engine sean cifrados obligatoriamente con llaves administradas por el cliente en KMS."
+                },
+                {
+                    section: "EXAMEN REAL",
+                    id: "REAL_Q5",
+                    question: "¿Qué servicio puede usar VPN como respaldo si falla Interconnect?",
+                    options: [
+                        "Failover Cloud",
+                        "Cloud NAT",
+                        "VPN Failover Routing",
+                        "Dedicated VPN"
+                    ],
+                    correct: 2,
+                    explanation: "Se configura Cloud Router con BGP dinámico asociando tanto Cloud Interconnect como túneles Cloud VPN como respaldo (VPN Failover Routing) para conmutar tráfico en caso de falla."
+                },
+                {
+                    section: "EXAMEN REAL",
+                    id: "REAL_Q6",
+                    question: "¿Qué servicio puede acceder automáticamente a un secreto si tiene permisos IAM?",
+                    options: [
+                        "Cloud Functions",
+                        "Cloud Storage",
+                        "Compute Engine Legacy",
+                        "Looker Studio"
+                    ],
+                    correct: 0,
+                    explanation: "Cloud Functions (y Cloud Run) utiliza cuentas de servicio vinculadas. Con el rol de acceso a Secret Manager, la función recupera secretos automáticamente."
+                },
+                {
+                    section: "EXAMEN REAL",
+                    id: "REAL_Q7",
+                    question: "¿Qué permite verificar los logs de conversaciones en Dialogflow?",
+                    options: [
+                        "Conversation History (History)",
+                        "Intent Analytics",
+                        "Cloud Trace Logs",
+                        "Dialogflow Monitor"
+                    ],
+                    correct: 0,
+                    explanation: "El módulo 'Conversation History' (History) en la consola de Dialogflow guarda los registros, respuestas e intents evaluados en las interacciones de los usuarios."
+                },
+
+                // SECCIÓN 1
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q1",
+                    question: "1. ¿Qué comando permite crear una política en Cloud Armor?",
+                    options: [
+                        "gcloud compute security-policies create",
+                        "gcloud armor policy create",
+                        "gcloud security create",
+                        "gcloud armor create"
+                    ],
+                    correct: 0,
+                    explanation: "El comando correcto en la gcloud CLI es 'gcloud compute security-policies create'."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q2",
+                    question: "2. ¿Qué tipo de almacenamiento es ideal para datos fríos?",
+                    options: [
+                        "Standard",
+                        "Nearline",
+                        "Coldline",
+                        "Archive"
+                    ],
+                    correct: 2,
+                    explanation: "Coldline Storage está diseñado para almacenar datos fríos a los que se accede como máximo una vez al año o cada 90 días."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q3",
+                    question: "3. ¿Qué requisito se necesita para usar Cloud Armor con HTTPS?",
+                    options: [
+                        "Cargar un certificado",
+                        "Usar Load Balancer global",
+                        "Configurar Cloud NAT",
+                        "Asignar IP pública"
+                    ],
+                    correct: 1,
+                    explanation: "Cloud Armor requiere ser adjuntado a un Balanceador de Carga HTTP(S) global para aplicar políticas de seguridad en el borde."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q4",
+                    question: "4. ¿Qué opción es válida al importar una clave externa a GCP?",
+                    options: [
+                        "Debe ser pública",
+                        "Se cifra con envoltura",
+                        "Solo RSA permitida",
+                        "Debe estar sin contraseña"
+                    ],
+                    correct: 1,
+                    explanation: "Las claves importadas a Cloud KMS se cifran con cifrado de envoltura (envelope encryption) utilizando una clave de protección para transporte."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q5",
+                    question: "5. ¿Qué servicio permite conectar una red local a GCP mediante túnel cifrado?",
+                    options: [
+                        "Cloud Interconnect",
+                        "Cloud NAT",
+                        "Cloud VPN",
+                        "Cloud Router"
+                    ],
+                    correct: 2,
+                    explanation: "Cloud VPN extiende su red local a GCP mediante un túnel IPsec cifrado a través de Internet."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q6",
+                    question: "6. ¿Qué recurso define mejor SaaS en GCP?",
+                    options: [
+                        "Cloud Build",
+                        "Cloud Functions",
+                        "Looker Studio",
+                        "Cloud Spanner"
+                    ],
+                    correct: 2,
+                    explanation: "Looker Studio es una plataforma SaaS (Software as a Service) completamente administrada para inteligencia de negocios y dashboards."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q7",
+                    question: "7. ¿Qué archivo contiene valores predeterminados para las variables en Terraform?",
+                    options: [
+                        "terraform.tfvars",
+                        "variables.tf",
+                        "defaults.tf",
+                        "env.tf"
+                    ],
+                    correct: 1,
+                    explanation: "En Terraform, las variables de entrada y sus valores por defecto (default) se definen dentro del archivo 'variables.tf'."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q8",
+                    question: "8. ¿Qué servicio puede integrarse directamente con KMS para cifrado automático?",
+                    options: [
+                        "Cloud SQL",
+                        "Cloud Run",
+                        "Cloud Monitoring",
+                        "Cloud DNS"
+                    ],
+                    correct: 1,
+                    explanation: "Cloud Run se integra con Cloud KMS para permitir cifrado de secretos y variables administradas con CMEK."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q9",
+                    question: "9. ¿Qué elemento controla el tráfico de entrada y salida en GCP?",
+                    options: [
+                        "Firewall Rules",
+                        "IAM",
+                        "Endpoints",
+                        "Routes"
+                    ],
+                    correct: 0,
+                    explanation: "Las reglas de Firewall en GCP permiten o deniegan el tráfico de entrada (ingress) y salida (egress) a las instancias de VM."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q10",
+                    question: "10. ¿Qué herramienta permite verificar la conectividad de Interconnect?",
+                    options: [
+                        "Cloud Trace",
+                        "Network Intelligence Center",
+                        "Stackdriver",
+                        "Ping interno"
+                    ],
+                    correct: 1,
+                    explanation: "Network Intelligence Center (Connectivity Tests) permite monitorear y verificar la conectividad de red, incluyendo Cloud Interconnect."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q11",
+                    question: "11. ¿Qué servicio de GCP permite ejecutar código en respuesta a eventos?",
+                    options: [
+                        "Cloud Run",
+                        "App Engine",
+                        "Cloud Functions",
+                        "Compute Engine"
+                    ],
+                    correct: 2,
+                    explanation: "Cloud Functions es la plataforma FaaS Serverless impulsada por eventos en GCP."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q12",
+                    question: "12. ¿Qué implica el modelo de responsabilidad compartida en la nube?",
+                    options: [
+                        "Proveedor gestiona todo",
+                        "Cliente gestiona todo",
+                        "Ambas partes tienen responsabilidades",
+                        "No hay roles definidos"
+                    ],
+                    correct: 2,
+                    explanation: "El modelo de responsabilidad compartida estipula que la seguridad DE la nube la lleva el proveedor y la seguridad EN la nube la gestiona el cliente."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q13",
+                    question: "13. ¿Qué extensión tienen comúnmente los archivos de Terraform?",
+                    options: [
+                        ".json",
+                        ".yaml",
+                        ".tf",
+                        ".hcl"
+                    ],
+                    correct: 2,
+                    explanation: "Los archivos de configuración de Terraform utilizan la extensión '.tf'."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q14",
+                    question: "14. ¿Qué componente de IAM define el conjunto de permisos?",
+                    options: [
+                        "Rol",
+                        "Política",
+                        "Cuenta de servicio",
+                        "Etiqueta"
+                    ],
+                    correct: 0,
+                    explanation: "Un Rol en IAM agrupa un conjunto de permisos que pueden otorgarse a los miembros o identidades."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q15",
+                    question: "15. ¿Qué tipo de campo permite realizar cálculos personalizados en Looker?",
+                    options: [
+                        "Variable",
+                        "Calculated Field",
+                        "Metric",
+                        "Dimension"
+                    ],
+                    correct: 1,
+                    explanation: "Un 'Calculated Field' (Campo calculado) en Looker Studio permite aplicar fórmulas matemáticas o lógicas sobre los datos."
+                },
+                {
+                    section: "SECCIÓN 1",
+                    id: "S1_Q16",
+                    question: "16. ¿Qué componente de Looker permite definir modelos semánticos?",
+                    options: [
+                        "LookML",
+                        "Dashboards",
+                        "Custom Tables",
+                        "View Editor"
+                    ],
+                    correct: 0,
+                    explanation: "LookML es el lenguaje de modelado usado en Looker para definir dimensiones, agregaciones y relaciones de datos."
+                },
+
+                // SECCIÓN 2
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q1",
+                    question: "1. ¿Qué puerto debe escuchar la app para ser compatible con Cloud Run?",
+                    options: ["8080", "80", "3000", "5000"],
+                    correct: 0,
+                    explanation: "Cloud Run envía peticiones a la variable de entorno PORT, la cual por defecto es el puerto 8080."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q2",
+                    question: "2. ¿Qué comando permite listar configuraciones de VPN?",
+                    options: [
+                        "gcloud compute vpn-tunnels list",
+                        "gcloud vpn list",
+                        "gcloud network vpn describe",
+                        "gcloud tunnels show"
+                    ],
+                    correct: 0,
+                    explanation: "'gcloud compute vpn-tunnels list' muestra todos los túneles VPN configurados en el proyecto."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q3",
+                    question: "3. ¿Qué tipo de rol se recomienda para limitar permisos al mínimo necesario?",
+                    options: [
+                        "Predefinido",
+                        "Personalizado",
+                        "Propietario",
+                        "Editor"
+                    ],
+                    correct: 1,
+                    explanation: "Un Rol Personalizado (Custom Role) permite granular exactamente los permisos específicos que la identidad necesita (Principio de menor privilegio)."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q4",
+                    question: "4. ¿Qué comando en CLI ejecuta una consulta en BigQuery?",
+                    options: [
+                        "gcloud bq run",
+                        "bq exec",
+                        "bq query",
+                        "gcloud bigquery select"
+                    ],
+                    correct: 2,
+                    explanation: "La herramienta de línea de comandos específica para BigQuery es 'bq', y el subcomando es 'bq query'."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q5",
+                    question: "5. ¿Qué comando permite listar políticas organizacionales?",
+                    options: [
+                        "gcloud org-policy list",
+                        "gcloud resource-policies list",
+                        "gcloud resource-manager org-policies list",
+                        "gcloud org-policies list"
+                    ],
+                    correct: 2,
+                    explanation: "El comando para listar políticas de organización utiliza el recurso 'resource-manager org-policies list'."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q6",
+                    question: "6. ¿Qué componente permite notificar alertas por email o Slack?",
+                    options: [
+                        "Notification Channels",
+                        "Alert Viewer",
+                        "Pub/Sub",
+                        "Cloud Logs"
+                    ],
+                    correct: 0,
+                    explanation: "En Cloud Monitoring, las alertas se envían a destinos configurados llamados 'Notification Channels'."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q7",
+                    question: "7. ¿Qué función permite limitar el acceso temporal a un objeto?",
+                    options: [
+                        "IAM Expiry",
+                        "Signed URL",
+                        "Access Lock",
+                        "Secure Key"
+                    ],
+                    correct: 1,
+                    explanation: "Una Signed URL (URL firmada) otorga acceso limitado en el tiempo para descargar o subir un objeto específico en Cloud Storage."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q8",
+                    question: "8. ¿Qué componente actúa como gateway predeterminado para subredes?",
+                    options: [
+                        "Router",
+                        "Firewall",
+                        "NAT",
+                        "Default Route"
+                    ],
+                    correct: 3,
+                    explanation: "La Default Route (0.0.0.0/0) creada automáticamente en la VPC actúa como la puerta de enlace predeterminada."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q9",
+                    question: "9. ¿Qué tipo de particionamiento se recomienda para datos con campos de fecha en BigQuery?",
+                    options: [
+                        "Por ID",
+                        "Por rango",
+                        "Por fecha",
+                        "Por texto"
+                    ],
+                    correct: 2,
+                    explanation: "El particionamiento por fecha (DATE / TIMESTAMP) optimiza costos y desempeño al filtrar rangos temporales."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q10",
+                    question: "10. ¿Qué API se utiliza para invocar funciones de DLP desde código?",
+                    options: [
+                        "dlp.googleapis.com",
+                        "iam.googleapis.com",
+                        "securitycenter.googleapis.com",
+                        "cloudkms.googleapis.com"
+                    ],
+                    correct: 0,
+                    explanation: "La API de Cloud Data Loss Prevention se invoca a través del endpoint 'dlp.googleapis.com'."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q11",
+                    question: "11. ¿Qué tipo de Interconnect proporciona acceso a través de socios autorizados?",
+                    options: [
+                        "Partner Interconnect",
+                        "Shared Interconnect",
+                        "Cloud NAT",
+                        "Peer VPN"
+                    ],
+                    correct: 0,
+                    explanation: "Partner Interconnect brinda conectividad privada entre su red local y VPC a través de un proveedor de servicio socio."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q12",
+                    question: "12. ¿Qué requisito se necesita para usar Cloud Armor con HTTPS?",
+                    options: [
+                        "Cargar un certificado",
+                        "Usar Load Balancer global",
+                        "Configurar Cloud NAT",
+                        "Asignar IP pública"
+                    ],
+                    correct: 1,
+                    explanation: "Cloud Armor requiere obligatoriamente estar vinculado a un HTTP(S) Load Balancer Global."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q13",
+                    question: "13. ¿Qué servicio proporciona conectividad privada dedicada entre GCP y on-premises?",
+                    options: [
+                        "Cloud VPN",
+                        "Cloud Router",
+                        "Dedicated Interconnect",
+                        "Shared VPC"
+                    ],
+                    correct: 2,
+                    explanation: "Dedicated Interconnect otorga un enlace directo físico de alta capacidad entre GCP y las instalaciones del cliente."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q14",
+                    question: "14. ¿Qué servicio permite conexión privada entre GCP y red local mediante VPN?",
+                    options: [
+                        "Cloud NAT",
+                        "Cloud VPN",
+                        "VPC Peering",
+                        "Subred extendida"
+                    ],
+                    correct: 1,
+                    explanation: "Cloud VPN establece un túnel cifrado IPsec para conectar de forma privada redes locales con GCP."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q15",
+                    question: "15. ¿Qué herramienta permite redirigir tráfico entre versiones en App Engine?",
+                    options: [
+                        "Cloud Router",
+                        "gcloud app services set-traffic",
+                        "Traffic Manager",
+                        "Service Splitter"
+                    ],
+                    correct: 1,
+                    explanation: "El comando 'gcloud app services set-traffic' gestiona la división (traffic splitting) entre versiones."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q16",
+                    question: "16. ¿Qué archivo define la infraestructura a desplegar en Terraform?",
+                    options: [
+                        "terraform.tfstate",
+                        "config.tf",
+                        "main.tf",
+                        "infra.yaml"
+                    ],
+                    correct: 2,
+                    explanation: "'main.tf' es el punto de entrada principal donde se declaran los recursos e infraestructura de Terraform."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q17",
+                    question: "17. ¿Qué herramienta se usa para ver gráficamente el rendimiento de una app?",
+                    options: [
+                        "Cloud Build",
+                        "Cloud Monitoring",
+                        "Cloud Debugger",
+                        "Cloud Storage"
+                    ],
+                    correct: 1,
+                    explanation: "Cloud Monitoring (antes Stackdriver) provee paneles, métricas y gráficos en tiempo real del rendimiento de la app."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q18",
+                    question: "18. ¿Qué comando permite crear un key ring en Cloud KMS?",
+                    options: [
+                        "gcloud kms keyrings create",
+                        "gcloud create keyring",
+                        "gcloud kms add-ring",
+                        "gcloud kms create-keyring"
+                    ],
+                    correct: 0,
+                    explanation: "El comando estándar de la CLI para KMS es 'gcloud kms keyrings create'."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q19",
+                    question: "19. ¿Qué recurso asocia una IP con un balanceador de carga?",
+                    options: [
+                        "Forwarding Rule",
+                        "Target Proxy",
+                        "Backend Service",
+                        "URL Map"
+                    ],
+                    correct: 0,
+                    explanation: "Una Forwarding Rule (regla de reenvío) asocia la dirección IP de entrada y puerto con un proxy de destino o balanceador."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q20",
+                    question: "20. ¿Qué se necesita para que DLP escanee automáticamente nuevos objetos cargados a un bucket?",
+                    options: [
+                        "Escaneo automático de DLP (DLP Auto-discovery / Trigger)",
+                        "Cloud Functions manual",
+                        "Regla de Firewall especial",
+                        "Cuenta de servicio global"
+                    ],
+                    correct: 0,
+                    explanation: "Se configura el escaneo automático o disparadores de DLP (Auto-discovery inspection / PubSub events) sobre Cloud Storage."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q21",
+                    question: "21. ¿Qué comando se utiliza para ver los roles disponibles de IAM?",
+                    options: [
+                        "gcloud iam roles list",
+                        "gcloud get roles",
+                        "gcloud iam list-roles",
+                        "gcloud security roles show"
+                    ],
+                    correct: 0,
+                    explanation: "'gcloud iam roles list' lista los roles predefinidos y personalizados en IAM."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q22",
+                    question: "22. ¿Qué comando se utiliza para asignar roles IAM a un usuario en un proyecto?",
+                    options: [
+                        "gcloud projects add-iam-policy-binding",
+                        "gcloud iam set-role",
+                        "gcloud user assign role",
+                        "gcloud projects grant-permission"
+                    ],
+                    correct: 0,
+                    explanation: "'gcloud projects add-iam-policy-binding' agrega la vinculación de un rol a un usuario o cuenta de servicio."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q23",
+                    question: "23. ¿Qué tipo de arquitectura de base de datos ocupa BigQuery?",
+                    options: [
+                        "Relacional pura",
+                        "NoSQL orientada a documentos",
+                        "Columnar (Column-oriented)",
+                        "En memoria (In-memory)"
+                    ],
+                    correct: 2,
+                    explanation: "BigQuery almacena sus datos en un formato de almacenamiento columnar orientado a bloques llamado Capacitor."
+                },
+                {
+                    section: "SECCIÓN 2",
+                    id: "S2_Q24",
+                    question: "24. ¿Qué servicio de GCP se utiliza para crear y administrar máquinas virtuales?",
+                    options: [
+                        "Compute Engine",
+                        "App Engine",
+                        "Cloud Run",
+                        "Google Kubernetes Engine"
+                    ],
+                    correct: 0,
+                    explanation: "Compute Engine es el servicio de Infraestructura como Servicio (IaaS) para ejecutar VMs en GCP."
+                },
+
+                // COMPLEMENTO
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q1",
+                    question: "001) ¿Qué componente permite reemplazar parte de un dato sensible con símbolos?",
+                    options: [
+                        "Hashing",
+                        "Tokenization",
+                        "Masking",
+                        "Encryption"
+                    ],
+                    correct: 2,
+                    explanation: "Masking (Enmascaramiento) oculta o reemplaza partes del dato sensible con caracteres especiales o símbolos (p. ej. XXXXXX)."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q2",
+                    question: "002) ¿Qué elemento permite dividir una red VPC?",
+                    options: [
+                        "Regiones",
+                        "Subredes",
+                        "Zonas",
+                        "Clusters"
+                    ],
+                    correct: 1,
+                    explanation: "Las subredes (subnets) dividen una red VPC en rangos IP específicos asignados a regiones."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q3",
+                    question: "003) ¿Qué evento o servicio puede activar una ejecución de Cloud Run por tiempo?",
+                    options: [
+                        "Cloud Scheduler",
+                        "Cloud Armor",
+                        "Cloud Build",
+                        "Cloud Tasks"
+                    ],
+                    correct: 0,
+                    explanation: "Cloud Scheduler funciona como un cron de la nube para ejecutar llamadas HTTP periódicas a servicios como Cloud Run."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q4",
+                    question: "004) ¿Qué elemento permite conectar una VM con otros servicios sin claves explícitas?",
+                    options: [
+                        "Firewall",
+                        "API Key",
+                        "Cuenta de servicio",
+                        "Bucket link"
+                    ],
+                    correct: 2,
+                    explanation: "Asignar una Cuenta de Servicio (Service Account) a una VM otorga identidades y permisos nativos en GCP sin gestionar claves fijas."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q5",
+                    question: "005) ¿Qué comando permite listar configuraciones de VPN?",
+                    options: [
+                        "gcloud compute vpn-tunnels list",
+                        "gcloud vpn list",
+                        "gcloud network vpn describe",
+                        "gcloud tunnels show"
+                    ],
+                    correct: 0,
+                    explanation: "'gcloud compute vpn-tunnels list' enumera los túneles VPN configurados."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q6",
+                    question: "006) ¿Qué servicio protege contra ataques DDoS y permite reglas de seguridad a nivel de aplicación?",
+                    options: [
+                        "Firewall Rules",
+                        "VPC SC",
+                        "Cloud Armor",
+                        "Cloud NAT"
+                    ],
+                    correct: 2,
+                    explanation: "Cloud Armor brinda protección contra ataques DDoS y un Web Application Firewall (WAF) administrado."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q7",
+                    question: "009) ¿Qué componente es requerido para configurar Cloud NAT?",
+                    options: [
+                        "Cloud Router",
+                        "Firewall Rule",
+                        "Route Table",
+                        "IAM Binding"
+                    ],
+                    correct: 0,
+                    explanation: "Cloud NAT requiere que se especifique un Cloud Router en la misma región para gestionar el enrutamiento y las tablas de traducción."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q8",
+                    question: "010) ¿Qué función permite limitar el acceso temporal a un objeto en Storage?",
+                    options: [
+                        "IAM Expiry",
+                        "Signed URL",
+                        "Access Lock",
+                        "Secure Key"
+                    ],
+                    correct: 1,
+                    explanation: "Las Signed URLs conceden permisos temporales de lectura o escritura a un objeto sin requerir cuentas de Google."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q9",
+                    question: "011) ¿Qué opción optimiza la consulta al usar BigQuery con Looker Studio?",
+                    options: [
+                        "Blending",
+                        "Sampling",
+                        "Caching",
+                        "Subquery"
+                    ],
+                    correct: 2,
+                    explanation: "El almacenamiento en caché (Caching) de resultados reutiliza consultas previas sin volver a cobrar por escaneo de BigQuery."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q10",
+                    question: "012) ¿Qué comando permite listar las redes VPC desde CLI?",
+                    options: [
+                        "gcloud networks list",
+                        "gcloud compute networks list",
+                        "gcloud vpc list",
+                        "gcloud get networks"
+                    ],
+                    correct: 1,
+                    explanation: "El comando correcto es 'gcloud compute networks list'."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q11",
+                    question: "013) ¿Qué servicio puede activar un intent o función desde eventos externos en GCP?",
+                    options: [
+                        "Intent Trigger",
+                        "Eventarc",
+                        "Input Event",
+                        "Pub/Sub"
+                    ],
+                    correct: 1,
+                    explanation: "Eventarc enruta eventos de forma asíncrona desde diversas fuentes hacia destinos como Cloud Run o Cloud Functions."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q12",
+                    question: "014) ¿Qué se usa en BigQuery para almacenar consultas complejas reutilizables?",
+                    options: [
+                        "Dataset",
+                        "Procedures",
+                        "Views",
+                        "Triggers"
+                    ],
+                    correct: 2,
+                    explanation: "Una Vista (View) es una tabla virtual definida por una consulta SQL de BigQuery que puede reutilizarse fácilmente."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q13",
+                    question: "016) ¿Qué servicio permite registrar acciones administrativas en GCP?",
+                    options: [
+                        "Cloud Tasks",
+                        "Audit Logs",
+                        "Activity Tracker",
+                        "Cloud Usage Meter"
+                    ],
+                    correct: 1,
+                    explanation: "Cloud Audit Logs registra las actividades administrativas y el acceso a datos dentro de GCP."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q14",
+                    question: "017) ¿Qué diferencia clave hay entre Partner Interconnect y Dedicated Interconnect?",
+                    options: [
+                        "Partner usa IP pública",
+                        "Dedicated no necesita socios",
+                        "Partner es para testing",
+                        "Solo Dedicated requiere Cloud Router"
+                    ],
+                    correct: 1,
+                    explanation: "Dedicated Interconnect conecta su centro de datos directamente a Google sin pasar por proveedores de servicios socios."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q15",
+                    question: "018) ¿Qué recurso define la configuración de protocolo, puerto y certificados SSL en un Load Balancer?",
+                    options: [
+                        "Target Proxy",
+                        "Forwarding Rule",
+                        "Backend Service",
+                        "Frontend Config"
+                    ],
+                    correct: 0,
+                    explanation: "El Target Proxy recibe las solicitudes, las desencripta con certificados SSL si aplica y procesa según las reglas."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q16",
+                    question: "019) ¿Qué archivo define la infraestructura a desplegar en Terraform?",
+                    options: [
+                        "terraform.tfstate",
+                        "config.tf",
+                        "main.tf",
+                        "infra.yaml"
+                    ],
+                    correct: 2,
+                    explanation: "'main.tf' es el archivo declarativo principal de Terraform."
+                },
+                {
+                    section: "COMPLEMENTO",
+                    id: "C_Q17",
+                    question: "020) ¿Qué extensión tienen comúnmente los archivos de Terraform?",
+                    options: [
+                        ".json",
+                        ".yaml",
+                        ".tf",
+                        ".hcl"
+                    ],
+                    correct: 2,
+                    explanation: "Los archivos de configuración de Terraform utilizan la extensión '.tf'."
+                }
+            ];
+
+
+        // ENGINE APP CONTROLLER
+    class ExamApp {
+        constructor() {
+            this.questions = [];
+            this.currentIndex = 0;
+            this.userAnswers = {}; // { qIndex: selectedOptionIndex }
+            this.flagged = new Set();
+            this.mode = 'practice'; // 'practice' | 'simulation'
+            this.timerInterval = null;
+            this.secondsElapsed = 0;
+
+            // DOM Elements
+            this.views = {
+                home: document.getElementById('view-home'),
+                quiz: document.getElementById('view-quiz'),
+                results: document.getElementById('view-results')
+            };
+        }
+
+        init() {
+            this.showHome();
+        }
+
+        showHome() {
+            this.stopTimer();
+            this.hideAllViews();
+            this.views.home.classList.remove('hidden');
+            document.getElementById('header-stats').classList.add('hidden');
+        }
+
+        updateModeUI(selectedMode) {
+            this.mode = selectedMode;
+            const labelPractice = document.getElementById('label-mode-practice');
+            const labelSim = document.getElementById('label-mode-sim');
+
+            if (selectedMode === 'practice') {
+                labelPractice.className = "relative flex items-start p-4 rounded-xl border border-blue-500/50 bg-blue-500/10 cursor-pointer transition hover:bg-slate-800";
+                labelSim.className = "relative flex items-start p-4 rounded-xl border border-slate-800 bg-slate-900/50 cursor-pointer transition hover:bg-slate-800";
+            } else {
+                labelSim.className = "relative flex items-start p-4 rounded-xl border border-blue-500/50 bg-blue-500/10 cursor-pointer transition hover:bg-slate-800";
+                labelPractice.className = "relative flex items-start p-4 rounded-xl border border-slate-800 bg-slate-900/50 cursor-pointer transition hover:bg-slate-800";
+            }
+        }
+
+        startQuiz() {
+            const sectionFilter = document.getElementById('select-section').value;
+            const shouldShuffle = document.getElementById('chk-shuffle').checked;
+
+            // 1. Filter Questions
+            let filtered = [];
+            if (sectionFilter === 'ALL') {
+                filtered = [...RAW_QUESTIONS_BANK];
+            } else if (sectionFilter === 'REAL') {
+                filtered = RAW_QUESTIONS_BANK.filter(q => q.section === 'EXAMEN REAL');
+            } else if (sectionFilter === 'SEC1') {
+                filtered = RAW_QUESTIONS_BANK.filter(q => q.section === 'SECCIÓN 1');
+            } else if (sectionFilter === 'SEC2') {
+                filtered = RAW_QUESTIONS_BANK.filter(q => q.section === 'SECCIÓN 2');
+            } else if (sectionFilter === 'COMP') {
+                filtered = RAW_QUESTIONS_BANK.filter(q => q.section === 'COMPLEMENTO');
+            }
+
+            if (filtered.length === 0) {
+                alert('No hay preguntas disponibles para el filtro seleccionado.');
+                return;
+            }
+
+            // Deep copy to allow option shuffling
+            this.questions = JSON.parse(JSON.stringify(filtered));
+
+            // 2. Shuffle if requested
+            if (shouldShuffle) {
+                this.shuffleArray(this.questions);
+                this.questions.forEach(q => {
+                    const originalOptions = [...q.options];
+                    const correctAnswerText = originalOptions[q.correct];
+                    this.shuffleArray(q.options);
+                    q.correct = q.options.indexOf(correctAnswerText);
+                });
+            }
+
+            // Reset state
+            this.currentIndex = 0;
+            this.userAnswers = {};
+            this.flagged.clear();
+            this.secondsElapsed = 0;
+
+            // UI setup
+            this.hideAllViews();
+            this.views.quiz.classList.remove('hidden');
+            document.getElementById('header-stats').classList.remove('hidden');
+
+            document.getElementById('stat-section').innerText =
+                sectionFilter === 'ALL' ? 'Examen Completo' :
+                    sectionFilter === 'REAL' ? 'Examen Real / Dudas' :
+                        sectionFilter === 'SEC1' ? 'Sección 1' :
+                            sectionFilter === 'SEC2' ? 'Sección 2' : 'Complemento';
+
+            // Timer Setup
+            const timerDisplay = document.getElementById('timer-display');
+            if (this.mode === 'simulation') {
+                timerDisplay.classList.remove('hidden');
+                this.startTimer();
+            } else {
+                timerDisplay.classList.add('hidden');
+            }
+
+            this.renderQuestion();
+        }
+
+        renderQuestion() {
+            const q = this.questions[this.currentIndex];
+            const total = this.questions.length;
+
+            // Update Counters & Bars
+            document.getElementById('quiz-question-counter').innerText = `Pregunta ${this.currentIndex + 1} de ${total}`;
+            const pct = ((this.currentIndex + 1) / total) * 100;
+            document.getElementById('quiz-progress-bar').style.width = `${pct}%`;
+
+            // Badge & Flag
+            document.getElementById('q-section-badge').innerText = q.section;
+            const flaggedIndicator = document.getElementById('q-flagged-indicator');
+            const btnFlagText = document.getElementById('btn-flag-text');
+            if (this.flagged.has(this.currentIndex)) {
+                flaggedIndicator.classList.remove('hidden');
+                btnFlagText.innerText = "Desmarcar";
+            } else {
+                flaggedIndicator.classList.add('hidden');
+                btnFlagText.innerText = "Marcar";
+            }
+
+            // Text
+            document.getElementById('q-text').innerText = q.question;
+
+            // Options
+            const optionsContainer = document.getElementById('q-options');
+            optionsContainer.innerHTML = '';
+
+            const selectedOpt = this.userAnswers[this.currentIndex];
+            const isAnswered = selectedOpt !== undefined;
+
+            q.options.forEach((optText, optIdx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border text-sm font-medium transition flex items-center justify-between ";
+
+                if (this.mode === 'practice' && isAnswered) {
+                    // Practice Mode Instant Styles
+                    if (optIdx === q.correct) {
+                        btn.className += "bg-emerald-500/20 border-emerald-500 text-emerald-200 font-bold";
+                    } else if (optIdx === selectedOpt) {
+                        btn.className += "bg-rose-500/20 border-rose-500 text-rose-200";
+                    } else {
+                        btn.className += "bg-slate-950/40 border-slate-800 text-slate-500 opacity-60";
+                    }
+                    btn.disabled = true;
+                } else {
+                    // Standard Selection / Simulation Mode
+                    if (selectedOpt === optIdx) {
+                        btn.className += "bg-blue-600/20 border-blue-500 text-white font-semibold ring-1 ring-blue-500";
+                    } else {
+                        btn.className += "bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800 hover:border-slate-700";
+                    }
+                }
+
+                // Option Key Label (A, B, C, D)
+                const letter = String.fromCharCode(65 + optIdx);
+                btn.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <span class="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center text-xs text-slate-400 font-bold">${letter}</span>
+                    <span>${optText}</span>
+                </div>
+                ${this.mode === 'practice' && isAnswered && optIdx === q.correct ? '<i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>' : ''}
+                ${this.mode === 'practice' && isAnswered && optIdx === selectedOpt && optIdx !== q.correct ? '<i class="fa-solid fa-circle-xmark text-rose-400 text-base"></i>' : ''}
+            `;
+
+                btn.onclick = () => this.selectOption(optIdx);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Instant Feedback Container (Practice Mode Only)
+            const feedbackBox = document.getElementById('q-feedback');
+            if (this.mode === 'practice' && isAnswered) {
+                feedbackBox.classList.remove('hidden');
+                const isCorrect = selectedOpt === q.correct;
+                const feedbackTitle = document.getElementById('q-feedback-title');
+                const feedbackBody = document.getElementById('q-feedback-body');
+
+                if (isCorrect) {
+                    feedbackBox.className = "mt-6 p-4 rounded-xl border text-sm space-y-1 bg-emerald-500/10 border-emerald-500/30 animate-fadeIn";
+                    feedbackTitle.className = "font-bold text-emerald-400 flex items-center space-x-2";
+                    feedbackTitle.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>¡Respuesta Correcta!</span>`;
+                } else {
+                    feedbackBox.className = "mt-6 p-4 rounded-xl border text-sm space-y-1 bg-rose-500/10 border-rose-500/30 animate-fadeIn";
+                    feedbackTitle.className = "font-bold text-rose-400 flex items-center space-x-2";
+                    feedbackTitle.innerHTML = `<i class="fa-solid fa-circle-xmark"></i><span>Respuesta Incorrecta</span>`;
+                }
+
+                feedbackBody.innerHTML = `
+                <p class="text-xs text-slate-300 font-medium mb-1"><span class="font-bold text-white">Respuesta esperada:</span> ${q.options[q.correct]}</p>
+                <p class="text-xs text-slate-400 leading-relaxed">${q.explanation}</p>
+            `;
+            } else {
+                feedbackBox.classList.add('hidden');
+            }
+
+            // Prev/Next Buttons state
+            document.getElementById('btn-prev').disabled = this.currentIndex === 0;
+
+            const btnNext = document.getElementById('btn-next');
+            if (this.currentIndex === total - 1) {
+                btnNext.innerHTML = `<span>Revisar / Finalizar</span> <i class="fa-solid fa-flag-checkered"></i>`;
+                btnNext.className = "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-6 rounded-xl shadow-lg shadow-emerald-600/20 transition flex items-center space-x-2";
+            } else {
+                btnNext.innerHTML = `<span>Siguiente</span> <i class="fa-solid fa-arrow-right"></i>`;
+                btnNext.className = "bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-6 rounded-xl shadow-lg shadow-blue-600/20 transition flex items-center space-x-2";
+            }
+        }
+
+        selectOption(optIdx) {
+            this.userAnswers[this.currentIndex] = optIdx;
+            this.renderQuestion();
+        }
+
+        toggleFlagCurrent() {
+            if (this.flagged.has(this.currentIndex)) {
+                this.flagged.delete(this.currentIndex);
+            } else {
+                this.flagged.add(this.currentIndex);
+            }
+            this.renderQuestion();
+        }
+
+        prevQuestion() {
+            if (this.currentIndex > 0) {
+                this.currentIndex--;
+                this.renderQuestion();
+            }
+        }
+
+        nextQuestion() {
+            if (this.currentIndex < this.questions.length - 1) {
+                this.currentIndex++;
+                this.renderQuestion();
+            } else {
+                this.finishQuizPrompt();
+            }
+        }
+
+        finishQuizPrompt() {
+            const total = this.questions.length;
+            const answeredCount = Object.keys(this.userAnswers).length;
+            const remaining = total - answeredCount;
+
+            let msg = `¿Deseas finalizar la evaluación ahora?`;
+            if (remaining > 0) {
+                msg = `Tienes ${remaining} pregunta(s) sin responder de ${total}.\n\n¿Estás seguro de que deseas finalizar?`;
+            }
+
+            if (confirm(msg)) {
+                this.finishQuiz();
+            }
+        }
+
+        finishQuiz() {
+            this.stopTimer();
+            this.hideAllViews();
+            this.views.results.classList.remove('hidden');
+
+            // Calculate Score
+            let correctCount = 0;
+            let incorrectCount = 0;
+            let unansweredCount = 0;
+
+            this.questions.forEach((q, idx) => {
+                const ans = this.userAnswers[idx];
+                if (ans === undefined) {
+                    unansweredCount++;
+                } else if (ans === q.correct) {
+                    correctCount++;
+                } else {
+                    incorrectCount++;
+                }
+            });
+
+            const total = this.questions.length;
+            const percentage = Math.round((correctCount / total) * 100);
+
+            // Update Results UI
+            document.getElementById('score-percentage').innerText = `${percentage}%`;
+            document.getElementById('score-fraction').innerText = `${correctCount} de ${total} Aciertos`;
+            document.getElementById('stat-correct-count').innerText = correctCount;
+            document.getElementById('stat-incorrect-count').innerText = incorrectCount;
+            document.getElementById('stat-unanswered-count').innerText = unansweredCount;
+
+            const scoreBadge = document.getElementById('score-badge');
+            const scoreStatus = document.getElementById('score-status');
+            const scoreSubtext = document.getElementById('score-subtext');
+
+            if (percentage >= 80) {
+                scoreBadge.className = "inline-block p-4 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-3xl";
+                scoreBadge.innerHTML = `<i class="fa-solid fa-trophy"></i>`;
+                scoreStatus.innerText = "¡Excelente Trabajo!";
+                scoreStatus.className = "text-2xl sm:text-3xl font-extrabold text-emerald-400";
+                scoreSubtext.innerText = "Demuestras un dominio sólido de la Guía GCP HITSS.";
+            } else if (percentage >= 60) {
+                scoreBadge.className = "inline-block p-4 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-3xl";
+                scoreBadge.innerHTML = `<i class="fa-solid fa-medal"></i>`;
+                scoreStatus.innerText = "¡Buen Intento!";
+                scoreStatus.className = "text-2xl sm:text-3xl font-extrabold text-amber-400";
+                scoreSubtext.innerText = "Estás cerca de alcanzar el estándar ideal. Revisa tus fallos.";
+            } else {
+                scoreBadge.className = "inline-block p-4 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-3xl";
+                scoreBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+                scoreStatus.innerText = "Requiere Repaso";
+                scoreStatus.className = "text-2xl sm:text-3xl font-extrabold text-rose-400";
+                scoreSubtext.innerText = "Te recomendamos revisar el material de estudio y repetir el test.";
+            }
+
+            this.renderDetailedReview('ALL');
+        }
+
+        renderDetailedReview(filter) {
+            const reviewContainer = document.getElementById('review-list');
+            reviewContainer.innerHTML = '';
+
+            this.questions.forEach((q, idx) => {
+                const ans = this.userAnswers[idx];
+                const isCorrect = ans === q.correct;
+                const isUnanswered = ans === undefined;
+
+                if (filter === 'WRONG' && isCorrect) return;
+
+                const card = document.createElement('div');
+                card.className = "bg-slate-950 border rounded-xl p-5 space-y-3 ";
+
+                if (isCorrect) {
+                    card.className += "border-emerald-500/30";
+                } else if (isUnanswered) {
+                    card.className += "border-slate-800";
+                } else {
+                    card.className += "border-rose-500/30";
+                }
+
+                let statusBadge = '';
+                if (isCorrect) {
+                    statusBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold px-2.5 py-1 rounded-md"><i class="fa-solid fa-check mr-1"></i>Correcta</span>`;
+                } else if (isUnanswered) {
+                    statusBadge = `<span class="bg-slate-800 text-slate-400 border border-slate-700 text-xs font-bold px-2.5 py-1 rounded-md"><i class="fa-solid fa-minus mr-1"></i>Sin Contestar</span>`;
+                } else {
+                    statusBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-bold px-2.5 py-1 rounded-md"><i class="fa-solid fa-xmark mr-1"></i>Incorrecta</span>`;
+                }
+
+                const userAnsText = isUnanswered ? "Ninguna respuesta seleccionada" : q.options[ans];
+                const correctAnsText = q.options[q.correct];
+
+                card.innerHTML = `
+                <div class="flex items-center justify-between gap-2">
+                    <span class="text-xs font-bold text-slate-400">${q.section} - Pregunta ${idx + 1}</span>
+                    ${statusBadge}
+                </div>
+                <p class="font-bold text-white text-sm sm:text-base">${q.question}</p>
+                
+                <div class="space-y-1.5 text-xs pt-2">
+                    ${!isCorrect ? `<div class="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300"><span class="font-bold">Tu respuesta:</span> ${userAnsText}</div>` : ''}
+                    <div class="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300"><span class="font-bold">Respuesta correcta:</span> ${correctAnsText}</div>
+                </div>
+
+                <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800 text-xs text-slate-400 mt-2">
+                    <span class="font-bold text-slate-300">Explicación:</span> ${q.explanation}
+                </div>
+            `;
+
+                reviewContainer.appendChild(card);
+            });
+        }
+
+        filterReview(filter) {
+            document.querySelectorAll('.review-filter-btn').forEach(btn => {
+                if (btn.dataset.filter === filter) {
+                    btn.className = "review-filter-btn text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-medium";
+                } else {
+                    btn.className = "review-filter-btn text-xs bg-slate-800 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg font-medium";
+                }
+            });
+            this.renderDetailedReview(filter);
+        }
+
+        restartExam() {
+            this.startQuiz();
+        }
+
+        // Grid Navigator Modal
+        toggleGridModal() {
+            const modal = document.getElementById('modal-grid');
+            if (modal.classList.contains('hidden')) {
+                this.renderGridButtons();
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        renderGridButtons() {
+            const container = document.getElementById('grid-buttons-container');
+            container.innerHTML = '';
+
+            this.questions.forEach((_, idx) => {
+                const btn = document.createElement('button');
+                const isCurrent = idx === this.currentIndex;
+                const isAnswered = this.userAnswers[idx] !== undefined;
+                const isFlagged = this.flagged.has(idx);
+
+                btn.className = "h-10 rounded-lg text-xs font-bold flex items-center justify-center transition border ";
+
+                if (isCurrent) {
+                    btn.className += "bg-blue-600 text-white border-blue-400 ring-2 ring-blue-400";
+                } else if (isFlagged) {
+                    btn.className += "bg-amber-500/20 text-amber-400 border-amber-500/50";
+                } else if (isAnswered) {
+                    btn.className += "bg-emerald-500/20 text-emerald-400 border-emerald-500/40";
+                } else {
+                    btn.className += "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700";
+                }
+
+                btn.innerText = idx + 1;
+                btn.onclick = () => {
+                    this.currentIndex = idx;
+                    this.renderQuestion();
+                    this.toggleGridModal();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // Timer Helpers
+        startTimer() {
+            this.stopTimer();
+            this.secondsElapsed = 0;
+            this.updateTimerDisplay();
+            this.timerInterval = setInterval(() => {
+                this.secondsElapsed++;
+                this.updateTimerDisplay();
+            }, 1000);
+        }
+
+        stopTimer() {
+            if (this.timerInterval) {
+                clearInterval(this.timerInterval);
+                this.timerInterval = null;
+            }
+        }
+
+        updateTimerDisplay() {
+            const mins = Math.floor(this.secondsElapsed / 60);
+            const secs = this.secondsElapsed % 60;
+            document.getElementById('timer-text').innerText =
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Utility Helpers
+        hideAllViews() {
+            Object.values(this.views).forEach(v => v.classList.add('hidden'));
+        }
+
+        shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+    }
+
+    // Initialize App on DOM Load
+    let app;
+    window.addEventListener('DOMContentLoaded', () => {
+        app = new ExamApp();
+        app.init();
+    });
+    </script>
+</body>
+</html>
